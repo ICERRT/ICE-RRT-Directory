@@ -3,6 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "start": "npm run dev",
     "dev": "vite dev --port 3000 --host",
     "build": "vite build",
     "serve": "vite preview",
