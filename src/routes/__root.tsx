@@ -1,27 +1,21 @@
+import { TanStackDevtools } from '@tanstack/react-devtools'
+import type { QueryClient } from '@tanstack/react-query'
 import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
-
 import StoreDevtools from '../lib/demo-store-devtools'
-
 import appCss from '../styles.css?url'
-
-import type { QueryClient } from '@tanstack/react-query'
-import { AppSidebar } from "@/components/app-sidebar"
-import { SidebarProvider } from "@/components/ui/sidebar"
-import { ThemeProvider } from "@/components/theme-provider"
 
 interface MyRouterContext {
   queryClient: QueryClient
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
+  ssr: false,
   head: () => ({
     meta: [
       {
@@ -41,6 +35,9 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         href: appCss,
       },
     ],
+    styles: [
+      { dangerouslySetInnerHTML: { __html: `body { background: black; }` } }
+    ]
   }),
 
   shellComponent: RootDocument,
