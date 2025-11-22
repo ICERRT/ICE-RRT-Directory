@@ -11,7 +11,7 @@ import {
     useReactTable,
     VisibilityState,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
+import { ArrowUpDown, ChevronDown } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -26,6 +26,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
+import {
     Table,
     TableBody,
     TableCell,
@@ -34,47 +41,65 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
-const data: Payment[] = [
-    {
-        id: "m5gr84i9",
-        amount: 316,
-        status: "success",
-        email: "ken99@example.com",
-    },
-    {
-        id: "3u1reuv4",
-        amount: 242,
-        status: "success",
-        email: "Abe45@example.com",
-    },
-    {
-        id: "derv1ws0",
-        amount: 837,
-        status: "processing",
-        email: "Monserrat44@example.com",
-    },
-    {
-        id: "5kma53ae",
-        amount: 874,
-        status: "success",
-        email: "Silas22@example.com",
-    },
-    {
-        id: "bhqecj4p",
-        amount: 721,
-        status: "failed",
-        email: "carmella@example.com",
-    },
-]
+const DEFAULT_CSV_URL = "/rrts.csv"
 
-export type Payment = {
-    id: string
-    amount: number
-    status: "pending" | "processing" | "success" | "failed"
+export type RrtGroup = {
+    name: string
+    stateTerrUs: string
+    regionNote: string
+    type: string
+    web: string
+    phone: string
     email: string
+    social: string
+    comment: string
 }
 
-export const columns: ColumnDef<Payment>[] = [
+// Minimal CSV line splitter that handles quoted fields and commas within quotes.
+function splitCsvLine(line: string): string[] {
+    const values: string[] = []
+    let current = ""
+    let inQuotes = false
+    for (let i = 0; i < line.length; i++) {
+        const char = line[i]
+        if (char === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+                current += '"'
+                i++
+            } else {
+                inQuotes = !inQuotes
+            }
+        } else if (char === "," && !inQuotes) {
+            values.push(current)
+            current = ""
+        } else {
+            current += char
+        }
+    }
+    values.push(current)
+    return values.map((v) => v.trim())
+}
+
+function parseCsv(text: string): Record<string, string>[] {
+    const lines = text
+        .split(/\r?\n/)
+        .map((l) => l.trim())
+        .filter((l) => l.length > 0)
+    if (lines.length === 0) return []
+    const header = splitCsvLine(lines[0])
+    const rows: Record<string, string>[] = []
+    for (let i = 1; i < lines.length; i++) {
+        const cols = splitCsvLine(lines[i])
+        const row: Record<string, string> = {}
+        for (let j = 0; j < header.length; j++) {
+            row[header[j]] = cols[j] ?? ""
+        }
+        rows.push(row)
+    }
+    return rows
+}
+
+export const columns: ColumnDef<RrtGroup>[] = [
     {
         id: "select",
         header: ({ table }) => (
@@ -98,74 +123,83 @@ export const columns: ColumnDef<Payment>[] = [
         enableHiding: false,
     },
     {
-        accessorKey: "status",
-        header: "Status",
-        cell: ({ row }) => (
-            <div className="capitalize">{row.getValue("status")}</div>
-        ),
-    },
-    {
-        accessorKey: "email",
+        accessorKey: "name",
         header: ({ column }) => {
             return (
                 <Button
                     variant="ghost"
                     onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
                 >
-                    Email
+                    Name
                     <ArrowUpDown />
                 </Button>
             )
         },
-        cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+        cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>,
     },
     {
-        accessorKey: "amount",
-        header: () => <div className="text-right">Amount</div>,
-        cell: ({ row }) => {
-            const amount = parseFloat(row.getValue("amount"))
-
-            // Format the amount as a dollar amount
-            const formatted = new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-            }).format(amount)
-
-            return <div className="text-right font-medium">{formatted}</div>
-        },
+        accessorKey: "stateTerrUs",
+        header: "State/Terr./US",
     },
     {
-        id: "actions",
-        enableHiding: false,
-        cell: ({ row }) => {
-            const payment = row.original
-
+        accessorKey: "regionNote",
+        header: "Region Note",
+    },
+    {
+        accessorKey: "type",
+        header: "Type",
+    },
+    {
+        accessorKey: "web",
+        header: ({ column }) => {
             return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(payment.id)}
-                        >
-                            Copy payment ID
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>View customer</DropdownMenuItem>
-                        <DropdownMenuItem>View payment details</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Web
+                    <ArrowUpDown />
+                </Button>
+            )
+        },
+        cell: ({ row }) => {
+            const url = String(row.getValue("web") ?? "")
+            if (!url) return <span>-</span>
+            return (
+                <a
+                    href={url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-600 underline"
+                >
+                    {url}
+                </a>
             )
         },
     },
+    {
+        accessorKey: "phone",
+        header: "Phone",
+    },
+    {
+        accessorKey: "email",
+        header: "Email",
+        cell: ({ row }) => <div className="lowercase">{row.getValue("email")}</div>,
+    },
+    {
+        accessorKey: "social",
+        header: "Social",
+    },
+    {
+        accessorKey: "comment",
+        header: "Comment",
+    },
 ]
 
-export function DataTable() {
+export function DataTable({ csvUrl = DEFAULT_CSV_URL }: { csvUrl?: string } = {}) {
+    const [data, setData] = React.useState<RrtGroup[]>([])
+    const [selectedState, setSelectedState] = React.useState<string | undefined>(undefined)
+    const [selectedRegion, setSelectedRegion] = React.useState<string | undefined>(undefined)
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
@@ -173,6 +207,70 @@ export function DataTable() {
     const [columnVisibility, setColumnVisibility] =
         React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
+
+    React.useEffect(() => {
+        let isCancelled = false
+        async function load() {
+            try {
+                const response = await fetch(csvUrl, { cache: "no-store" })
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`)
+                }
+                const text = await response.text()
+                const rows = parseCsv(text)
+                const rrts: RrtGroup[] = rows
+                    .map((r) => {
+                        return {
+                            name: r["Name"] ?? "",
+                            stateTerrUs: r["State/Terr./US"] ?? "",
+                            regionNote: r["Region Note"] ?? "",
+                            type: r["Type"] ?? "",
+                            web: r["Web"] ?? "",
+                            phone: r["Phone"] ?? "",
+                            email: r["Email"] ?? "",
+                            social: r["Social"] ?? "",
+                            comment: r["Comment"] ?? "",
+                        }
+                    })
+                    .filter((p) => Object.values(p).some((v) => String(v).trim().length > 0))
+                if (!isCancelled) {
+                    setData(rrts)
+                }
+            } catch (err) {
+                console.error(err)
+                if (!isCancelled) {
+                    setData([])
+                }
+            }
+        }
+        load()
+        return () => {
+            isCancelled = true
+        }
+    }, [csvUrl])
+
+    const uniqueStates = React.useMemo(
+        () =>
+            Array.from(
+                new Set(
+                    data
+                        .map((d) => d.stateTerrUs)
+                        .filter((v): v is string => Boolean(v && v.trim().length > 0))
+                )
+            ).sort(),
+        [data]
+    )
+    const uniqueRegions = React.useMemo(
+        () =>
+            Array.from(
+                new Set(
+                    data
+                        .map((d) => d.regionNote)
+                        .filter((v): v is string => Boolean(v && v.trim().length > 0))
+                )
+            ).sort(),
+        [data]
+    )
 
     const table = useReactTable({
         data,
@@ -197,13 +295,69 @@ export function DataTable() {
         <div className="w-full">
             <div className="flex items-center py-4">
                 <Input
-                    placeholder="Filter emails..."
-                    value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+                    placeholder="Filter names..."
+                    value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("email")?.setFilterValue(event.target.value)
+                        table.getColumn("name")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />
+                <div className="ml-2 w-56">
+                    <Select
+                        value={selectedState}
+                        onValueChange={(value) => {
+                            if (value === "all") {
+                                setSelectedState(undefined)
+                                table.getColumn("stateTerrUs")?.setFilterValue(undefined)
+                                return
+                            }
+                            setSelectedState(value)
+                            table.getColumn("stateTerrUs")?.setFilterValue(
+                                value
+                            )
+                        }}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="All states/territories" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            {uniqueStates.map((s) => (
+                                <SelectItem key={s} value={s}>
+                                    {s}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="ml-2 w-56">
+                    <Select
+                        value={selectedRegion}
+                        onValueChange={(value) => {
+                            if (value === "all") {
+                                setSelectedRegion(undefined)
+                                table.getColumn("regionNote")?.setFilterValue(undefined)
+                                return
+                            }
+                            setSelectedRegion(value)
+                            table.getColumn("regionNote")?.setFilterValue(
+                                value
+                            )
+                        }}
+                    >
+                        <SelectTrigger>
+                            <SelectValue placeholder="All regions" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="all">All</SelectItem>
+                            {uniqueRegions.map((r) => (
+                                <SelectItem key={r} value={r}>
+                                    {r}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">
