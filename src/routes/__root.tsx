@@ -48,6 +48,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <style>{`body { background: black; }`}</style>
       </head>
       <body>
         {children}
