@@ -17,7 +17,7 @@ function App() {
           <img src="/logo512.png" alt="ICE RRT" className="h-11 w-11" />
         </div>
         <InputGroup className="max-w-64">
-          <InputGroupInput placeholder="Search by state (ex: California)" autoFocus />
+          <InputGroupInput placeholder="Search by state..." autoFocus />
           <InputGroupAddon>
             <Search />
           </InputGroupAddon>
