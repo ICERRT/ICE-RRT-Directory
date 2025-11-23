@@ -17,7 +17,7 @@ function App() {
 
   // Filter teams based on search term.
   const filteredTeams = searchTerm ? teams.filter(team =>
-    [team.name, team.stateTerrUs, team.regionNote].join(' ').toLowerCase().includes(searchTerm.trim().toLowerCase())
+    [team.name, team.stateTerrUs, team.regionNote].join(' ').toLowerCase().includes(searchTerm.toLowerCase())
   ) : teams;
 
   useEffect(() => {
@@ -36,7 +36,7 @@ function App() {
         </div>
         <InputGroup className="max-w-64">
           <InputGroupInput placeholder="Search by state..." autoFocus onInput={(e) => {
-            setSearchTerm((e.target as HTMLInputElement).value.toLowerCase())
+            setSearchTerm((e.target as HTMLInputElement).value.trim())
           }} />
           <InputGroupAddon>
             <Search />
