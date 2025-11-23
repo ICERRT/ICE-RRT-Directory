@@ -37,21 +37,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-import { parseCsv } from "@/csv"
-
-const DEFAULT_CSV_URL = "/rrts.csv"
-
-export type RrtGroup = {
-    name: string
-    stateTerrUs: string
-    regionNote: string
-    type: string
-    web: string
-    phone: string
-    email: string
-    social: string
-    comment: string
-}
+import { fetchCsv, RrtGroup } from "@/csv"
 
 export const columns: ColumnDef<RrtGroup>[] = [
     {
@@ -150,7 +136,7 @@ export const columns: ColumnDef<RrtGroup>[] = [
     },
 ]
 
-export function DataTable({ csvUrl = DEFAULT_CSV_URL }: { csvUrl?: string } = {}) {
+export function DataTable() {
     const [data, setData] = React.useState<RrtGroup[]>([])
     const [selectedState, setSelectedState] = React.useState<string | undefined>(undefined)
     const [selectedRegion, setSelectedRegion] = React.useState<string | undefined>(undefined)
@@ -166,27 +152,7 @@ export function DataTable({ csvUrl = DEFAULT_CSV_URL }: { csvUrl?: string } = {}
         let isCancelled = false
         async function load() {
             try {
-                const response = await fetch(csvUrl, { cache: "no-store" })
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`)
-                }
-                const text = await response.text()
-                const rows = parseCsv(text)
-                const rrts: RrtGroup[] = rows
-                    .map((r) => {
-                        return {
-                            name: r["Name"] ?? "",
-                            stateTerrUs: r["State/Terr./US"] ?? "",
-                            regionNote: r["Region Note"] ?? "",
-                            type: r["Type"] ?? "",
-                            web: r["Web"] ?? "",
-                            phone: r["Phone"] ?? "",
-                            email: r["Email"] ?? "",
-                            social: r["Social"] ?? "",
-                            comment: r["Comment"] ?? "",
-                        }
-                    })
-                    .filter((p) => Object.values(p).some((v) => String(v).trim().length > 0))
+                const rrts = await fetchCsv()
                 if (!isCancelled) {
                     setData(rrts)
                 }
@@ -201,7 +167,7 @@ export function DataTable({ csvUrl = DEFAULT_CSV_URL }: { csvUrl?: string } = {}
         return () => {
             isCancelled = true
         }
-    }, [csvUrl])
+    }, [])
 
     const uniqueStates = React.useMemo(
         () =>

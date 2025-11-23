@@ -1,3 +1,43 @@
+const CSV_URL = '/rrts.csv'
+
+export type RrtGroup = {
+  name: string
+  stateTerrUs: string
+  regionNote: string
+  type: string
+  web: string
+  phone: string
+  email: string
+  social: string
+  comment: string
+}
+
+/** Fetches CSV and parses it. */
+export async function fetchCsv(): Promise<RrtGroup[]> {
+  const response = await fetch(CSV_URL, { cache: 'no-store' })
+  if (!response.ok) {
+    throw new Error(
+      `Failed to fetch CSV: ${response.status} ${response.statusText}`,
+    )
+  }
+  const text = await response.text()
+  const rows = parseCsv(text)
+  const rrts: RrtGroup[] = rows
+    .map((r) => ({
+      name: r['Name'] ?? '',
+      stateTerrUs: r['State/Terr./US'] ?? '',
+      regionNote: r['Region Note'] ?? '',
+      type: r['Type'] ?? '',
+      web: r['Web'] ?? '',
+      phone: r['Phone'] ?? '',
+      email: r['Email'] ?? '',
+      social: r['Social'] ?? '',
+      comment: r['Comment'] ?? '',
+    }))
+    .filter((p) => Object.values(p).some((v) => String(v).trim().length > 0))
+  return rrts
+}
+
 /** Parses CSV text into an array of objects, using the first line as headers. */
 export function parseCsv(text: string): Record<string, string>[] {
   const lines = text
