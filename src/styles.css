@@ -142,3 +142,8 @@ code {
 .fade-in {
   animation: fadeIn 0.32s ease-in-out;
 }
+
+header {
+  background-color: rgb(25 25 25 / 0.85);
+  backdrop-filter: blur(0.75rem);
+}

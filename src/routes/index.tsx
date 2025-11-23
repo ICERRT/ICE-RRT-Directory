@@ -51,7 +51,7 @@ function App() {
 
   return (
     <div className="fade-in">
-      <header className="flex h-20 items-center gap-4 px-4 justify-center bg-card">
+      <header className="flex h-20 items-center gap-4 px-4 justify-center sticky top-0 shadow-lg border-b">
         <div className="logo">
           <img src="/logo512.png" alt="ICE RRT" className="h-11 w-11" />
         </div>
