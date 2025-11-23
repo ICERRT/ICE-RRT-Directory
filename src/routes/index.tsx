@@ -26,7 +26,7 @@ function App() {
 
       <h2 className="text-xl font-medium text-center py-6">Find the right Rapid Response Team</h2>
 
-      <div className="flex flex-wrap items-center gap-4 px-4 justify-center max-w-3xl mx-auto">
+      <div className="flex flex-wrap items-center gap-4 px-4 pb-8 justify-center max-w-3xl mx-auto">
         <SampleCard />
         <SampleCard extra />
         <SampleCard />
