@@ -1,13 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Search } from "lucide-react"
 
-import { ThemeProvider } from "@/components/theme-provider"
 import { Badge } from '@/components/ui/badge'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import { RippleButton } from '@/components/ui/shadcn-io/ripple-button'
-import { useEffect, useState } from 'react'
 import { fetchCsv, RrtGroup } from '@/csv'
+import { useEffect, useState } from 'react'
 
 export const Route = createFileRoute('/')({ ssr: false, component: App })
 
@@ -29,7 +28,7 @@ function App() {
   }, [])
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <div className="fade-in">
       <header className="flex h-20 items-center gap-4 px-4 justify-center bg-card">
         <div className="logo">
           <img src="/logo512.png" alt="ICE RRT" className="h-11 w-11" />
@@ -44,7 +43,7 @@ function App() {
         </InputGroup>
       </header>
 
-      <h2 className="text-xl font-medium text-center py-6">Find the right Rapid Response Team</h2>
+      <h2 className="text-xl font-medium text-center py-6">Find a Rapid Response Team</h2>
 
       <div className="flex flex-wrap items-center justify-center gap-4 px-4 pb-8 max-w-4xl mx-auto">
         {teams.length === 0 && (
@@ -80,6 +79,6 @@ function App() {
           </Card>
         ))}
       </div>
-    </ThemeProvider>
+    </div>
   )
 }
