@@ -2,9 +2,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Search } from "lucide-react"
 
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
-import { RippleButton } from '@/components/ui/shadcn-io/ripple-button'
 import { Spinner } from '@/components/ui/spinner'
 import { fetchCsv, RrtGroup } from '@/csv'
 import { useEffect, useState } from 'react'
@@ -73,9 +73,9 @@ function App() {
                 <Badge variant="secondary">{team.regionNote}, {team.stateTerrUs}</Badge>
               </div>
 
-              <RippleButton type="submit" className="" onClick={() => window.open(team.web, '_blank')}>
+              <Button type="submit" className="cursor-pointer" onClick={() => window.open(team.web, '_blank')}>
                 Contact
-              </RippleButton>
+              </Button>
             </CardFooter>
           </Card>
         ))}
