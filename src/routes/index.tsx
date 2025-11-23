@@ -51,7 +51,7 @@ function App() {
         )}
 
         {teams.length > 0 && filteredTeams.length === 0 && (
-          <p className="text-center text-muted-foreground">No teams matched the search term: "{searchTerm}".</p>
+          <p className="text-center text-muted-foreground">Sorry, no teams found for: "{searchTerm}"</p>
         )}
 
         {filteredTeams.map((team) => (
