@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import { RippleButton } from '@/components/ui/shadcn-io/ripple-button'
+import { Spinner } from '@/components/ui/spinner'
 import { fetchCsv, RrtGroup } from '@/csv'
 import { useEffect, useState } from 'react'
 
@@ -47,7 +48,7 @@ function App() {
 
       <div className="flex flex-wrap items-center justify-center gap-4 px-4 pb-8 max-w-4xl mx-auto">
         {teams.length === 0 && (
-          <p className="text-center text-muted-foreground">Loading teams...</p>
+          <Spinner className="size-8 opacity-48" />
         )}
 
         {teams.length > 0 && filteredTeams.length === 0 && (
@@ -55,7 +56,7 @@ function App() {
         )}
 
         {filteredTeams.map((team) => (
-          <Card className="w-full max-w-sm" key={team.name}>
+          <Card className="fade-in w-full max-w-sm" key={team.name}>
             <CardHeader className="px-4">
               <CardTitle className="h-8">{team.name}</CardTitle>
               <CardDescription>
