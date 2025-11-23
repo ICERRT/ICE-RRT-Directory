@@ -22,8 +22,29 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      // Fetch teams.
-      const teams = await fetchCsv()
+      // Fetch teams and geolocation in parallel.
+      const teamsPromise = fetchCsv()
+      const geolocationPromise = fetch('https://ipv4-check-perf.radar.cloudflare.com/api/info').then(res => res.json()).catch(() => undefined)
+      const [teams, geolocation] = await Promise.all([teamsPromise, geolocationPromise])
+
+      // If geolocation is available, sort teams by proximity.
+      if (geolocation?.country === 'US') {
+        const city = geolocation.city.toLowerCase();
+        const state = geolocation.region.toLowerCase();
+        teams.sort((a, b) => {
+          // State matches are weighted less heavily than city matches.
+          const stateMatchA = a.stateTerrUs.toLowerCase().includes(state) ? 1 : 0;
+          const stateMatchB = b.stateTerrUs.toLowerCase().includes(state) ? 1 : 0;
+
+          // City matches are weighted more heavily than state matches.
+          const cityMatchA = a.regionNote.toLowerCase().includes(city) ? 2 : 0;
+          const cityMatchB = b.regionNote.toLowerCase().includes(city) ? 2 : 0;
+
+          // Sort by total match score (state + city).
+          return (stateMatchB + cityMatchB) - (stateMatchA + cityMatchA);
+        });
+      }
+
       setTeams(teams)
     })()
   }, [])
