@@ -1,4 +1,3 @@
-import * as React from "react"
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -12,6 +11,7 @@ import {
     VisibilityState,
 } from "@tanstack/react-table"
 import { ArrowUpDown, ChevronDown } from "lucide-react"
+import * as React from "react"
 
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -19,10 +19,7 @@ import {
     DropdownMenu,
     DropdownMenuCheckboxItem,
     DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
+    DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import {
@@ -40,64 +37,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
-
-const DEFAULT_CSV_URL = "/rrts.csv"
-
-export type RrtGroup = {
-    name: string
-    stateTerrUs: string
-    regionNote: string
-    type: string
-    web: string
-    phone: string
-    email: string
-    social: string
-    comment: string
-}
-
-// Minimal CSV line splitter that handles quoted fields and commas within quotes.
-function splitCsvLine(line: string): string[] {
-    const values: string[] = []
-    let current = ""
-    let inQuotes = false
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i]
-        if (char === '"') {
-            if (inQuotes && line[i + 1] === '"') {
-                current += '"'
-                i++
-            } else {
-                inQuotes = !inQuotes
-            }
-        } else if (char === "," && !inQuotes) {
-            values.push(current)
-            current = ""
-        } else {
-            current += char
-        }
-    }
-    values.push(current)
-    return values.map((v) => v.trim())
-}
-
-function parseCsv(text: string): Record<string, string>[] {
-    const lines = text
-        .split(/\r?\n/)
-        .map((l) => l.trim())
-        .filter((l) => l.length > 0)
-    if (lines.length === 0) return []
-    const header = splitCsvLine(lines[0])
-    const rows: Record<string, string>[] = []
-    for (let i = 1; i < lines.length; i++) {
-        const cols = splitCsvLine(lines[i])
-        const row: Record<string, string> = {}
-        for (let j = 0; j < header.length; j++) {
-            row[header[j]] = cols[j] ?? ""
-        }
-        rows.push(row)
-    }
-    return rows
-}
+import { fetchCsv, RrtGroup } from "@/csv"
 
 export const columns: ColumnDef<RrtGroup>[] = [
     {
@@ -196,7 +136,7 @@ export const columns: ColumnDef<RrtGroup>[] = [
     },
 ]
 
-export function DataTable({ csvUrl = DEFAULT_CSV_URL }: { csvUrl?: string } = {}) {
+export function DataTable() {
     const [data, setData] = React.useState<RrtGroup[]>([])
     const [selectedState, setSelectedState] = React.useState<string | undefined>(undefined)
     const [selectedRegion, setSelectedRegion] = React.useState<string | undefined>(undefined)
@@ -212,27 +152,7 @@ export function DataTable({ csvUrl = DEFAULT_CSV_URL }: { csvUrl?: string } = {}
         let isCancelled = false
         async function load() {
             try {
-                const response = await fetch(csvUrl, { cache: "no-store" })
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`)
-                }
-                const text = await response.text()
-                const rows = parseCsv(text)
-                const rrts: RrtGroup[] = rows
-                    .map((r) => {
-                        return {
-                            name: r["Name"] ?? "",
-                            stateTerrUs: r["State/Terr./US"] ?? "",
-                            regionNote: r["Region Note"] ?? "",
-                            type: r["Type"] ?? "",
-                            web: r["Web"] ?? "",
-                            phone: r["Phone"] ?? "",
-                            email: r["Email"] ?? "",
-                            social: r["Social"] ?? "",
-                            comment: r["Comment"] ?? "",
-                        }
-                    })
-                    .filter((p) => Object.values(p).some((v) => String(v).trim().length > 0))
+                const rrts = await fetchCsv()
                 if (!isCancelled) {
                     setData(rrts)
                 }
@@ -247,7 +167,7 @@ export function DataTable({ csvUrl = DEFAULT_CSV_URL }: { csvUrl?: string } = {}
         return () => {
             isCancelled = true
         }
-    }, [csvUrl])
+    }, [])
 
     const uniqueStates = React.useMemo(
         () =>

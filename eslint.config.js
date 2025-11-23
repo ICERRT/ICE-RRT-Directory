@@ -2,4 +2,11 @@
 
 import { tanstackConfig } from '@tanstack/eslint-config'
 
-export default [...tanstackConfig]
+export default [...tanstackConfig,
+{
+  "@typescript-eslint/array-type": [
+    "error", {
+      "default": "array",
+    }]
+}
+]
