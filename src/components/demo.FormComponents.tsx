@@ -26,7 +26,7 @@ export function SubscribeButton({ label }: { label: string }) {
 function ErrorMessages({
   errors,
 }: {
-  errors: Array<string | { message: string }>
+  errors: (string | { message: string })[]
 }) {
   return (
     <>
@@ -101,7 +101,7 @@ export function Select({
   placeholder,
 }: {
   label: string
-  values: Array<{ label: string; value: string }>
+  values: { label: string; value: string }[]
   placeholder?: string
 }) {
   const field = useFieldContext<string>()
