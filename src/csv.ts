@@ -25,8 +25,8 @@ export async function fetchCsv(): Promise<RrtGroup[]> {
   const rrts: RrtGroup[] = rows
     .map((r) => ({
       name: r['Name'] ?? '',
-      stateTerrUs: r['State/Terr./US'] ?? '',
-      regionNote: r['Region Note'] ?? '',
+      stateTerrUs: r['State/Territory/District'] ?? '',
+      regionNote: r['City or region note'] ?? '',
       type: r['Type'] ?? '',
       web: r['Web'] ?? '',
       phone: r['Phone'] ?? '',
