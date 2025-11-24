@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Search } from "lucide-react"
+import { HeartPlus, Search } from "lucide-react"
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -15,10 +15,23 @@ function App() {
   const [searchTerm, setSearchTerm] = useState('');
   const [teams, setTeams] = useState<RrtGroup[]>([]);
 
-  // Filter teams based on search term.
-  const filteredTeams = searchTerm ? teams.filter(team =>
-    [team.name, team.stateTerrUs, team.regionNote].join(' ').toLowerCase().includes(searchTerm.toLowerCase())
-  ) : teams;
+  // Separate national teams from local teams.
+  const nationalTeams = [];
+  const localTeams = [];
+  for (const team of teams) {
+    if (team.stateTerrUs === 'National') {
+      nationalTeams.push(team);
+    } else {
+      // Filter local teams based on search term.
+      if (searchTerm) {
+        const teamText = [team.name, team.stateTerrUs, team.regionNote].join(' ').toLowerCase();
+        if (!teamText.includes(searchTerm.toLowerCase())) {
+          continue;
+        }
+      }
+      localTeams.push(team);
+    }
+  }
 
   useEffect(() => {
     (async () => {
@@ -67,16 +80,22 @@ function App() {
 
       <h2 className="text-xl font-medium text-center py-6">Find a Rapid Response Team</h2>
 
+      {teams.length === 0 && (
+        <Spinner className="size-8 opacity-48" />
+      )}
+
+      {teams.length > 0 && localTeams.length === 0 && (
+        <p className="text-center text-muted-foreground px-4 pb-8">
+          Sorry, no local teams matched "{searchTerm}".
+          <br />
+          <a target="_blank" href="https://submissions.icerrt.com/">
+            <HeartPlus className="inline" /> Suggest a team
+          </a>
+        </p>
+      )}
+
       <div className="flex flex-wrap items-center justify-center gap-4 px-4 pb-8 max-w-4xl mx-auto">
-        {teams.length === 0 && (
-          <Spinner className="size-8 opacity-48" />
-        )}
-
-        {teams.length > 0 && filteredTeams.length === 0 && (
-          <p className="text-center text-muted-foreground">Sorry, no teams found for: "{searchTerm}"</p>
-        )}
-
-        {filteredTeams.map((team) => (
+        {localTeams.concat(nationalTeams).map((team) => (
           <Card className="fade-in w-full max-w-sm" key={team.name}>
             <CardHeader className="px-4">
               <CardTitle className="h-8">{team.name}</CardTitle>
@@ -91,7 +110,10 @@ function App() {
 
             <CardFooter className="flex-row px-4 justify-between">
               <div className="flex flex-row gap-1">
-                <Badge variant="secondary">{team.regionNote}, {team.stateTerrUs}</Badge>
+                <Badge variant="secondary">
+                  {team.regionNote && <>{team.regionNote}, </>}
+                  {team.stateTerrUs}
+                </Badge>
               </div>
 
               <Button type="submit" className="cursor-pointer" onClick={() => window.open(team.web, '_blank')}>
