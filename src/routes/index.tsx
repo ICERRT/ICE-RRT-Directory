@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Search } from "lucide-react"
+import { HeartPlus, Search } from "lucide-react"
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -86,7 +86,10 @@ function App() {
 
       {teams.length > 0 && localTeams.length === 0 && (
         <p className="text-center text-muted-foreground pb-8">
-          Sorry, no local teams matched "{searchTerm}". Want to <a target="_blank" href="https://submissions.icerrt.com/">suggest a team</a>?
+          Sorry, no local teams matched "{searchTerm}". &nbsp;
+          <a target="_blank" href="https://submissions.icerrt.com/">
+            <HeartPlus className="inline" /> Suggest a team
+          </a>
         </p>
       )}
 
