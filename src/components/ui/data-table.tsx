@@ -213,7 +213,7 @@ export function DataTable() {
 
     return (
         <div className="w-full">
-            <div className="flex items-center py-4">
+            <div className="flex flex-wrap gap-1 py-4">
                 <Input
                     placeholder="Filter names..."
                     value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
@@ -222,65 +222,61 @@ export function DataTable() {
                     }
                     className="max-w-sm"
                 />
-                <div className="ml-2 w-56">
-                    <Select
-                        value={selectedState}
-                        onValueChange={(value) => {
-                            if (value === "all") {
-                                setSelectedState(undefined)
-                                table.getColumn("stateTerrUs")?.setFilterValue(undefined)
-                                return
-                            }
-                            setSelectedState(value)
-                            table.getColumn("stateTerrUs")?.setFilterValue(
-                                value
-                            )
-                        }}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="All states/territories" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All</SelectItem>
-                            {uniqueStates.map((s) => (
-                                <SelectItem key={s} value={s}>
-                                    {s}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="ml-2 w-56">
-                    <Select
-                        value={selectedRegion}
-                        onValueChange={(value) => {
-                            if (value === "all") {
-                                setSelectedRegion(undefined)
-                                table.getColumn("regionNote")?.setFilterValue(undefined)
-                                return
-                            }
-                            setSelectedRegion(value)
-                            table.getColumn("regionNote")?.setFilterValue(
-                                value
-                            )
-                        }}
-                    >
-                        <SelectTrigger>
-                            <SelectValue placeholder="All regions" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All</SelectItem>
-                            {uniqueRegions.map((r) => (
-                                <SelectItem key={r} value={r}>
-                                    {r}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
+                <Select
+                    value={selectedState}
+                    onValueChange={(value) => {
+                        if (value === "all") {
+                            setSelectedState(undefined)
+                            table.getColumn("stateTerrUs")?.setFilterValue(undefined)
+                            return
+                        }
+                        setSelectedState(value)
+                        table.getColumn("stateTerrUs")?.setFilterValue(
+                            value
+                        )
+                    }}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="All states/territories" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        {uniqueStates.map((s) => (
+                            <SelectItem key={s} value={s}>
+                                {s}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+                <Select
+                    value={selectedRegion}
+                    onValueChange={(value) => {
+                        if (value === "all") {
+                            setSelectedRegion(undefined)
+                            table.getColumn("regionNote")?.setFilterValue(undefined)
+                            return
+                        }
+                        setSelectedRegion(value)
+                        table.getColumn("regionNote")?.setFilterValue(
+                            value
+                        )
+                    }}
+                >
+                    <SelectTrigger>
+                        <SelectValue placeholder="All regions" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All</SelectItem>
+                        {uniqueRegions.map((r) => (
+                            <SelectItem key={r} value={r}>
+                                {r}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="ml-auto">
+                        <Button variant="outline" className="md:ml-auto">
                             Columns <ChevronDown />
                         </Button>
                     </DropdownMenuTrigger>
@@ -359,6 +355,10 @@ export function DataTable() {
                 <div className="text-muted-foreground flex-1 text-sm">
                     {table.getFilteredSelectedRowModel().rows.length} of{" "}
                     {table.getFilteredRowModel().rows.length} row(s) selected.
+                </div>
+                <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+                    Page {table.getState().pagination.pageIndex + 1} of{" "}
+                    {table.getPageCount()}
                 </div>
                 <div className="space-x-2">
                     <Button
