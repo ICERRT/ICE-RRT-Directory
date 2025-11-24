@@ -86,7 +86,7 @@ function App() {
 
       {teams.length > 0 && localTeams.length === 0 && (
         <p className="text-center text-muted-foreground pb-8">
-          Sorry, no local teams matched "{searchTerm}". Feel free to <a target="_blank" href="https://submissions.icerrt.com/">suggest a team</a>.
+          Sorry, no local teams matched "{searchTerm}". Want to <a target="_blank" href="https://submissions.icerrt.com/">suggest a team</a>?
         </p>
       )}
 
