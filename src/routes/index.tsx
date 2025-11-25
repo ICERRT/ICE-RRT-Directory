@@ -85,7 +85,7 @@ function App() {
 
       {teams.length > 0 && localTeams.length === 0 && (
         <p className="text-center text-muted-foreground px-4 pb-8">
-          Sorry, no local teams matched "{searchTerm}".
+          Sorry, no local teams matched "{searchTerm}". Try the county or state?
           <br />
           <a target="_blank" href="https://submissions.icerrt.com/">
             <HeartPlus className="inline" /> Suggest a team
