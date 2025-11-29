@@ -1,9 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { HeartPlus, Search } from "lucide-react"
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { InputGroup, InputGroupAddon, InputGroupInput } from "@/components/ui/input-group"
 import { Spinner } from '@/components/ui/spinner'
 import { fetchCsv, RrtGroup } from '@/csv'
@@ -69,7 +68,7 @@ function App() {
           <img src="/logo512.png" alt="ICE RRT" className="h-11 w-11" />
         </div>
         <InputGroup className="max-w-64">
-          <InputGroupInput placeholder="Search by state..." autoFocus onInput={(e) => {
+          <InputGroupInput placeholder="Search by state, county, or city" autoFocus onInput={(e) => {
             setSearchTerm((e.target as HTMLInputElement).value.trim())
           }} />
           <InputGroupAddon>
@@ -78,7 +77,7 @@ function App() {
         </InputGroup>
       </header>
 
-      <h2 className="text-xl font-medium text-center py-6">Find a Rapid Response Team</h2>
+      <h2 className="text-xl font-medium text-center py-6 text-gray-500">Local teams</h2>
 
       {teams.length === 0 && (
         <Spinner className="size-8 opacity-48" />
@@ -86,7 +85,7 @@ function App() {
 
       {teams.length > 0 && localTeams.length === 0 && (
         <p className="text-center text-muted-foreground px-4 pb-8">
-          Sorry, no local teams matched "{searchTerm}".
+          Sorry, no local teams matched "{searchTerm}". Try the county or state?
           <br />
           <a target="_blank" href="https://submissions.icerrt.com/">
             <HeartPlus className="inline" /> Suggest a team
@@ -94,35 +93,43 @@ function App() {
         </p>
       )}
 
-      <div className="flex flex-wrap items-center justify-center gap-4 px-4 pb-8 max-w-4xl mx-auto">
-        {localTeams.concat(nationalTeams).map((team) => (
-          <Card className="fade-in w-full max-w-sm" key={team.name}>
-            <CardHeader className="px-4">
-              <CardTitle className="h-8">{team.name}</CardTitle>
-              <CardDescription>
-                {team.comment}
-                <br />
-                <br />
+      {localTeams && (
+        <div className="gap-4 px-4 pb-8 max-w-7xl mx-auto columns-xs space-y-4">
+          {localTeams.map((team) => (
+            <TeamCard key={team.id} team={team} />
+          ))}
+        </div>
+      )}
 
-                Services: {team.type.split(';').join(', ')}
-              </CardDescription>
-            </CardHeader>
+      <h2 className="text-xl font-medium text-center py-6 text-gray-500">National teams</h2>
 
-            <CardFooter className="flex-row px-4 justify-between">
-              <div className="flex flex-row gap-1">
-                <Badge variant="secondary">
-                  {team.regionNote && <>{team.regionNote}, </>}
-                  {team.stateTerrUs}
-                </Badge>
-              </div>
-
-              <Button type="submit" className="cursor-pointer" onClick={() => window.open(team.web, '_blank')}>
-                Contact
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+      {nationalTeams && (
+        <div className="gap-4 px-4 pb-8 max-w-7xl mx-auto columns-xs space-y-4">
+          {nationalTeams.map((team) => (
+            <TeamCard key={team.id} team={team} />
+          ))}
+        </div>
+      )}
     </div>
   )
+}
+
+function TeamCard({ team }: { team: RrtGroup }) {
+  return (
+    <Card className="fade-in w-full py-4 break-inside-avoid" key={team.id}>
+      <CardHeader className="px-4">
+        <CardTitle className="text-lg pb-2">{team.name}</CardTitle>
+        <CardDescription className="flex flex-row justify-between gap-4">
+          <div>
+            {team.regionNote && <>{team.regionNote}</>}
+            <br />
+            <strong>{team.stateTerrUs}</strong>
+          </div>
+          <Button type="submit" className="cursor-pointer" onClick={() => window.open(team.web, '_blank')}>
+            Contact
+          </Button>
+        </CardDescription>
+      </CardHeader>
+    </Card>
+  );
 }

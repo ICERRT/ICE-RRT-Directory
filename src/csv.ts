@@ -1,6 +1,7 @@
 const CSV_URL = '/rrts.csv'
 
 export type RrtGroup = {
+  id: string
   name: string
   stateTerrUs: string
   regionNote: string
@@ -24,6 +25,7 @@ export async function fetchCsv(): Promise<RrtGroup[]> {
   const rows = parseCsv(text)
   const rrts: RrtGroup[] = rows
     .map((r) => ({
+      id: r['Name'] + '--' + r['State/Territory/District'],
       name: r['Name'] ?? '',
       stateTerrUs: r['State/Territory/District'] ?? '',
       regionNote: r['City or region note'] ?? '',
